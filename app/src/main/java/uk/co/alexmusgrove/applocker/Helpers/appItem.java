@@ -3,22 +3,23 @@ package uk.co.alexmusgrove.applocker.Helpers;
 import android.graphics.drawable.Drawable;
 
 public class appItem {
-    private String mText1;
+    private String mAppName;
     private String mPackageName;
     private Drawable mAppIcon;
+    private boolean mLocked;
 
     //Constructor
-    public appItem(String mText1, String mPackageName, Drawable mAppIcon) {
-        this.mText1 = mText1;
+    public appItem(String mAppName, String mPackageName, Drawable mAppIcon, boolean mLocked) {
+        this.mAppName = mAppName;
         this.mPackageName = mPackageName;
         this.mAppIcon = mAppIcon;
+        this.mLocked = mLocked;
     }
 
     //Getters and Setters
-    public String getmText1() {
-        return mText1;
+    public String getmAppName() {
+        return mAppName;
     }
-
 
     public String getmPackageName() {
         return mPackageName;
@@ -26,5 +27,9 @@ public class appItem {
 
     public Drawable getmAppIcon() {
         return mAppIcon;
+    }
+
+    public boolean getmLocked() {
+        return mLocked;
     }
 }

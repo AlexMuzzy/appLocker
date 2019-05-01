@@ -17,6 +17,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activities.SettingsActivity"></activity>
+        <provider
+            android:authorities="uk.co.alexmusgrove.applocker.Database.AppContentProvider"
+            android:name=".Database.AppContentProvider"
+        />
     </application>
 
 </manifest>
