@@ -17,7 +17,7 @@ import java.util.HashMap;
 public class AppContentProvider extends ContentProvider {
     private AppSQLiteDBHelper dbHelper;
 
-    private static final String AUTHORITY = "uk.co.alexmusgrove.applocker.Database.AppContentProvider";
+    private static final String AUTHORITY = "uk.co.alexmusgrove.applocker.Database.ContentProvider";
     private static final String BASE_PATH = "provider";
 
     //create content URIs from the authority be appending path to database table

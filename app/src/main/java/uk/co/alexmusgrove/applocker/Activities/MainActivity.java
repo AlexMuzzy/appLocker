@@ -19,6 +19,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import java.io.File;
@@ -31,11 +32,10 @@ import uk.co.alexmusgrove.applocker.Database.AppSQLiteDBHelper;
 import uk.co.alexmusgrove.applocker.R;
 import uk.co.alexmusgrove.applocker.Helpers.appItem;
 
-public class MainActivity extends AppCompatActivity {
+public class  MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private ArrayList<appItem> appItems = new ArrayList<>();
-    private ContentResolver myCR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +44,6 @@ public class MainActivity extends AppCompatActivity {
 
         generateAppItems();
         buildRecyclerView();
-        //getAllApps();
-        checkDatabase();
     }
 
     //Overriding methods for options menu
@@ -76,13 +74,18 @@ public class MainActivity extends AppCompatActivity {
             if ((packageInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
                 //grab application label from package name
                 String appName = (String) pm.getApplicationLabel(packageInfo);
-
+                ArrayList<String> appList = getAllApps();
+                for (String app : appList) {
+                    Log.i(TAG, "generateAppItems: " + app);
+                }
+                Log.i(TAG, "generateAppItems: " + appList.size());
+                //TODO fix checked event listener
                 //append details to appItem class
                 appItems.add(new appItem(
                         appName, //name of application
                         packageInfo.packageName, // unique package name of application
                         packageInfo.loadIcon(pm), // application icon
-                        false // app lock switch state
+                        appList.contains(packageInfo.packageName) // app lock switch state
                 ));
             }
         }
@@ -105,18 +108,19 @@ public class MainActivity extends AppCompatActivity {
                 (position) -> launchAppIntent(appItems.get(position).getmPackageName())
         );
 
-        adapter.setOnCheckedChangeListener((int position, boolean isChecked) -> {
+        adapter.setOnCheckedChangeListener((CompoundButton buttonView, int position, boolean isChecked) -> {
             //TODO
-                if (isChecked){
+            if (buttonView.isShown()) {
+                if (isChecked) {
                     addApp(appItems.get(position));
                 }
                 Toast.makeText(
                         getApplicationContext(),
                         (isChecked)
-                                ? "Locked "  + appItems.get(position).getmAppName()
+                                ? "Locked " + appItems.get(position).getmAppName()
                                 : "Unlocked " + appItems.get(position).getmAppName(),
                         Toast.LENGTH_SHORT).show();
-
+            }
         });
     }
 
@@ -145,12 +149,12 @@ public class MainActivity extends AppCompatActivity {
     public void addApp (appItem appItem) {
         ContentValues values = new ContentValues();
         values.put(AppSQLiteDBHelper.COLUMN_PACKAGENAME, appItem.getmPackageName());
-        myCR.insert(AppContentProvider.CONTENT_URI, values);
+        getContentResolver().insert(AppContentProvider.CONTENT_URI, values);
     }
 
-/*    public ArrayList<String> getAllApps () {
+   public ArrayList<String> getAllApps () {
         ArrayList<String> apps = new ArrayList<>();
-        Cursor cursor = myCR.query(AppContentProvider.CONTENT_URI,
+        Cursor cursor = getContentResolver().query(AppContentProvider.CONTENT_URI,
                 null,
                 null,
                 null,
@@ -160,19 +164,5 @@ public class MainActivity extends AppCompatActivity {
             apps.add(cursor.getString(1));
         }
         return apps;
-    }*/
-
-    public void checkDatabase () {
-        File database=getApplicationContext().getDatabasePath(AppSQLiteDBHelper.DATABASE_NAME);
-
-        if (!database.exists()) {
-            // Database does not exist so copy it from assets here
-            Log.i("Database", "Not Found");
-            Context context = this;
-            String dbpath = context.getDatabasePath(AppSQLiteDBHelper.DATABASE_NAME).getPath();
-
-        } else {
-            Log.i("Database", "Found");
-        }
     }
 }

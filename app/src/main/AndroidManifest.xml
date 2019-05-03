@@ -18,8 +18,8 @@
         </activity>
         <activity android:name=".Activities.SettingsActivity"></activity>
         <provider
-            android:authorities="uk.co.alexmusgrove.applocker.Database.AppContentProvider"
-            android:name=".Database.AppContentProvider"
+            android:authorities="uk.co.alexmusgrove.applocker.Database.ContentProvider"
+            android:name="uk.co.alexmusgrove.applocker.Database.AppContentProvider"
         />
     </application>
 

@@ -25,7 +25,7 @@ public class appAdapter extends RecyclerView.Adapter<appAdapter.appViewHolder> {
     }
 
     public interface OnCheckedChangeListener {
-        void onCheckedChange(int position, boolean checked);
+        void onCheckedChanged(CompoundButton buttonView, int position, boolean checked);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -38,14 +38,12 @@ public class appAdapter extends RecyclerView.Adapter<appAdapter.appViewHolder> {
 
     public static class appViewHolder extends RecyclerView.ViewHolder {
         TextView mTextView1;
-        TextView mTextView2;
         ImageView mAppIcon;
         Switch mSwitch;
 
         appViewHolder(@NonNull View itemView, final OnItemClickListener listener, final OnCheckedChangeListener changeListener) {
             super(itemView);
             mTextView1 = itemView.findViewById(R.id.textView_1);
-            mTextView2 = itemView.findViewById(R.id.textView_2);
             mAppIcon = itemView.findViewById(R.id.imageView);
             mSwitch = itemView.findViewById(R.id.lock_switch);
 
@@ -63,7 +61,7 @@ public class appAdapter extends RecyclerView.Adapter<appAdapter.appViewHolder> {
                 if (changeListener != null){
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION){
-                        changeListener.onCheckedChange(position, isChecked);
+                        changeListener.onCheckedChanged(buttonView, position, isChecked);
                     }
                 }
             });
@@ -86,7 +84,6 @@ public class appAdapter extends RecyclerView.Adapter<appAdapter.appViewHolder> {
         appItem currentItem = appList.get(i);
 
         vh.mTextView1.setText(currentItem.getmAppName());
-        vh.mTextView2.setText(currentItem.getmPackageName());
         vh.mAppIcon.setImageDrawable(currentItem.getmAppIcon());
         vh.mSwitch.setChecked(currentItem.getmLocked());
     }

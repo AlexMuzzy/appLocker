@@ -18,7 +18,7 @@ public class AppSQLiteDBHelper extends SQLiteOpenHelper {
 //    private ContentResolver myCR;
 
     private static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "appLocker_DB";
+    public static final String DATABASE_NAME = "appLocker_DB.db";
 
     public AppSQLiteDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -55,24 +55,4 @@ public class AppSQLiteDBHelper extends SQLiteOpenHelper {
         this.onCreate(db);
 
     }
-/*
-    public void addApp (appItem appItem) {
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_PACKAGENAME, appItem.getmPackageName());
-        myCR.insert(AppContentProvider.CONTENT_URI, values);
-    }
-
-    public ArrayList<String> getAllApps () {
-        ArrayList<String> apps = new ArrayList<>();
-        Cursor cursor = myCR.query(AppContentProvider.CONTENT_URI,
-                null,
-                null,
-                null,
-                null
-        );
-        while (cursor.moveToNext()){
-            apps.add(cursor.getString(1));
-        }
-        return apps;
-    }*/
 }
