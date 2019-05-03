@@ -32,4 +32,8 @@ public class appItem {
     public boolean getmLocked() {
         return mLocked;
     }
+
+    public void setmLocked(boolean mLocked) {
+        this.mLocked = mLocked;
+    }
 }

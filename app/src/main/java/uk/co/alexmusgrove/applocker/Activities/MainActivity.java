@@ -112,7 +112,7 @@ public class  MainActivity extends AppCompatActivity {
             //TODO
             if (buttonView.isShown()) {
                 if (isChecked) {
-                    addApp(appItems.get(position));
+                    addApp(appItems.get(position), position);
                 }
                 Toast.makeText(
                         getApplicationContext(),
@@ -146,10 +146,11 @@ public class  MainActivity extends AppCompatActivity {
         }
     }
 
-    public void addApp (appItem appItem) {
+    public void addApp (appItem appItem, int position) {
         ContentValues values = new ContentValues();
         values.put(AppSQLiteDBHelper.COLUMN_PACKAGENAME, appItem.getmPackageName());
         getContentResolver().insert(AppContentProvider.CONTENT_URI, values);
+        appItems.get(position).setmLocked(true);
     }
 
    public ArrayList<String> getAllApps () {
