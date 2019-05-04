@@ -36,6 +36,15 @@ public class appAdapter extends RecyclerView.Adapter<appAdapter.appViewHolder> {
         mCheckedListener = changeListener;
     }
 
+    public appAdapter(ArrayList<appItem> appList){
+        this.appList = appList;
+    }
+
+    @Override
+    public int getItemCount() {
+        return appList.size();
+    }
+
     public static class appViewHolder extends RecyclerView.ViewHolder {
         TextView mTextView1;
         ImageView mAppIcon;
@@ -69,9 +78,7 @@ public class appAdapter extends RecyclerView.Adapter<appAdapter.appViewHolder> {
     }
 
 
-    public appAdapter(ArrayList<appItem> appList){
-        this.appList = appList;
-    }
+
     @NonNull
     @Override
     public appViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
@@ -88,8 +95,5 @@ public class appAdapter extends RecyclerView.Adapter<appAdapter.appViewHolder> {
         vh.mSwitch.setChecked(currentItem.getmLocked());
     }
 
-    @Override
-    public int getItemCount() {
-        return appList.size();
-    }
+
 }
