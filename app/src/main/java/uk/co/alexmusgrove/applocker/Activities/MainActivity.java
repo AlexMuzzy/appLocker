@@ -1,5 +1,7 @@
 package uk.co.alexmusgrove.applocker.Activities;
 
+import android.Manifest;
+import android.app.AppOpsManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -12,6 +14,7 @@ import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,8 +32,11 @@ import java.util.List;
 import uk.co.alexmusgrove.applocker.Adapters.appAdapter;
 import uk.co.alexmusgrove.applocker.Database.AppContentProvider;
 import uk.co.alexmusgrove.applocker.Database.AppSQLiteDBHelper;
+import uk.co.alexmusgrove.applocker.Fragments.permissionFragment;
 import uk.co.alexmusgrove.applocker.R;
 import uk.co.alexmusgrove.applocker.Helpers.appItem;
+import uk.co.alexmusgrove.applocker.Services.appIntentService;
+import uk.co.alexmusgrove.applocker.Services.appService;
 
 public class  MainActivity extends AppCompatActivity {
 
@@ -41,9 +47,13 @@ public class  MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        if (!hasUsageStatsPermission()) {
+            permissionFragment dialog = permissionFragment.newInstance();
+            dialog.show(this.getSupportFragmentManager(), "permissionFragment");
+        }
         generateAppItems();
         buildRecyclerView();
+        startAppService();
     }
 
     //Overriding methods for options menu
@@ -165,5 +175,20 @@ public class  MainActivity extends AppCompatActivity {
             apps.add(cursor.getString(1));
         }
         return apps;
+    }
+
+    public void startAppService () {
+        if (hasUsageStatsPermission()) {
+            //check if user has granted permission for usage of this service.
+            Intent appService = new Intent(this, appIntentService.class);
+            appService.setAction(USAGE_STATS_SERVICE);
+            startService(appService);
+        }
+    }
+
+    private boolean hasUsageStatsPermission () {
+        AppOpsManager appOpsManager = (AppOpsManager) this.getSystemService(Context.APP_OPS_SERVICE);
+        int mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), getApplicationContext().getPackageName());
+        return (mode == AppOpsManager.MODE_ALLOWED);
     }
 }
