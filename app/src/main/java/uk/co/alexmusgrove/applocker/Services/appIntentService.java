@@ -4,7 +4,6 @@ import android.app.ActivityManager;
 import android.app.IntentService;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
-import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.util.Log;

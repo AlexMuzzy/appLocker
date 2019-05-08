@@ -1,9 +1,7 @@
 package uk.co.alexmusgrove.applocker.Activities;
 
-import android.Manifest;
 import android.app.AppOpsManager;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -12,9 +10,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,7 +20,6 @@ import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,7 +83,6 @@ public class  MainActivity extends AppCompatActivity {
                     Log.i(TAG, "generateAppItems: " + app);
                 }
                 Log.i(TAG, "generateAppItems: " + appList.size());
-                //TODO fix checked event listener
                 //append details to appItem class
                 appItems.add(new appItem(
                         appName, //name of application
@@ -119,7 +112,6 @@ public class  MainActivity extends AppCompatActivity {
         );
 
         adapter.setOnCheckedChangeListener((CompoundButton buttonView, int position, boolean isChecked) -> {
-            //TODO
             if (buttonView.isShown()) {
                 if (isChecked) {
                     addApp(appItems.get(position), position);
