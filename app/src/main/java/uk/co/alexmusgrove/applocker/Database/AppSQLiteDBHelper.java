@@ -55,4 +55,18 @@ public class AppSQLiteDBHelper extends SQLiteOpenHelper {
         this.onCreate(db);
 
     }
+
+    public static ArrayList<String> getAllApps (Context context) {
+        ArrayList<String> apps = new ArrayList<>();
+        Cursor cursor = context.getContentResolver().query(AppContentProvider.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        while (cursor.moveToNext()){
+            apps.add(cursor.getString(1));
+        }
+        return apps;
+    }
 }

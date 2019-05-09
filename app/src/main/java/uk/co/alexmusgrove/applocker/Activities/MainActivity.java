@@ -9,7 +9,6 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,7 +28,6 @@ import uk.co.alexmusgrove.applocker.Database.AppSQLiteDBHelper;
 import uk.co.alexmusgrove.applocker.Fragments.permissionFragment;
 import uk.co.alexmusgrove.applocker.R;
 import uk.co.alexmusgrove.applocker.Helpers.appItem;
-import uk.co.alexmusgrove.applocker.Services.appIntentService;
 import uk.co.alexmusgrove.applocker.Services.appService;
 
 public class  MainActivity extends AppCompatActivity {
@@ -78,7 +76,7 @@ public class  MainActivity extends AppCompatActivity {
             if ((packageInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
                 //grab application label from package name
                 String appName = (String) pm.getApplicationLabel(packageInfo);
-                ArrayList<String> appList = getAllApps();
+                ArrayList<String> appList = AppSQLiteDBHelper.getAllApps(this);
                 for (String app : appList) {
                     Log.i(TAG, "generateAppItems: " + app);
                 }
@@ -155,25 +153,13 @@ public class  MainActivity extends AppCompatActivity {
         appItems.get(position).setmLocked(true);
     }
 
-   public ArrayList<String> getAllApps () {
-        ArrayList<String> apps = new ArrayList<>();
-        Cursor cursor = getContentResolver().query(AppContentProvider.CONTENT_URI,
-                null,
-                null,
-                null,
-                null
-        );
-        while (cursor.moveToNext()){
-            apps.add(cursor.getString(1));
-        }
-        return apps;
-    }
 
     public void startAppService () {
         if (hasUsageStatsPermission()) {
             //check if user has granted permission for usage of this service.
-            Intent appService = new Intent(this, appIntentService.class);
+            Intent appService = new Intent(this, appService.class);
             appService.setAction(USAGE_STATS_SERVICE);
+            stopService(appService);
             startService(appService);
         }
     }
@@ -184,3 +170,4 @@ public class  MainActivity extends AppCompatActivity {
         return (mode == AppOpsManager.MODE_ALLOWED);
     }
 }
+
