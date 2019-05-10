@@ -70,7 +70,7 @@ public class  MainActivity extends AppCompatActivity {
         final PackageManager pm = getPackageManager();
         //get a list of installed apps.
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-
+        Log.i(TAG, "testload: ");
         for (ApplicationInfo packageInfo : packages) {
             //filter all systems applications out of loop
             if ((packageInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
@@ -108,11 +108,14 @@ public class  MainActivity extends AppCompatActivity {
         adapter.setOnItemClickListener(
                 (position) -> launchAppIntent(appItems.get(position).getmPackageName())
         );
-
         adapter.setOnCheckedChangeListener((CompoundButton buttonView, int position, boolean isChecked) -> {
+            Log.i(TAG, "numberOfApps: " + AppSQLiteDBHelper.getAllApps(this).size());
             if (buttonView.isShown()) {
                 if (isChecked) {
                     addApp(appItems.get(position), position);
+                }
+                if(!isChecked){
+                    removeApp(appItems.get(position), position);
                 }
                 Toast.makeText(
                         getApplicationContext(),
@@ -153,13 +156,18 @@ public class  MainActivity extends AppCompatActivity {
         appItems.get(position).setmLocked(true);
     }
 
+    public void removeApp (appItem appItem, int position) {
+        getContentResolver().delete(AppContentProvider.CONTENT_URI, AppSQLiteDBHelper.COLUMN_PACKAGENAME + " = '" + appItem.getmPackageName() + "'", null);
+        Log.i(TAG, "removeApp: removed");
+        appItems.remove(position);
+    }
+
 
     public void startAppService () {
         if (hasUsageStatsPermission()) {
             //check if user has granted permission for usage of this service.
             Intent appService = new Intent(this, appService.class);
             appService.setAction(USAGE_STATS_SERVICE);
-            stopService(appService);
             startService(appService);
         }
     }

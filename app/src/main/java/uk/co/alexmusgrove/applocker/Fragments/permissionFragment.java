@@ -44,7 +44,6 @@ public class permissionFragment extends DialogFragment {
     }
 
     public static permissionFragment newInstance() {
-        permissionFragment f = new permissionFragment();
-        return f;
+        return new permissionFragment();
     }
 }

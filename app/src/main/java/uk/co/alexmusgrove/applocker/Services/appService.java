@@ -6,6 +6,7 @@ import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -18,10 +19,14 @@ import java.util.TreeMap;
 import uk.co.alexmusgrove.applocker.Activities.MainActivity;
 import uk.co.alexmusgrove.applocker.Activities.lockActivity;
 import uk.co.alexmusgrove.applocker.Database.AppSQLiteDBHelper;
+import uk.co.alexmusgrove.applocker.Helpers.unlockedApp;
 
 public class appService extends Service {
 
     private static final String TAG = "uk.co.alexmusgrove.applocker.Services";
+    private static boolean onState = false;
+    Intent testIntent;
+    ArrayList<unlockedApp> unlockedApps;
 
     @Nullable
     @Override
@@ -32,9 +37,18 @@ public class appService extends Service {
     @Override
     public void onCreate() {
         Log.i(TAG, "Service has now started.");
-        new Thread(new Runnable(){
-            public void run() {
-                // TODO Auto-generated method stub
+
+        Bundle extras = testIntent.getExtras();
+        if (extras != null){
+            String unlockedPackageName = extras.getString("packageName");
+            if (unlockedPackageName != null){
+                unlockedApps.add(new unlockedApp(unlockedPackageName));
+                Log.i(TAG, "addedUnlockedApp: " + unlockedPackageName);
+            }
+        }
+        if (!onState){
+            onState = true;
+            new Thread(() -> {
                 while(true) {
                     try {
                         Thread.sleep(1000);
@@ -45,16 +59,18 @@ public class appService extends Service {
                     String packageName = getForegroundPackageName();
                     Log.i(TAG, "ForegroundApp: " + getForegroundPackageName());
                     if (isMyAppRunning()){
+                        if (unlockedApps.size() > 0 && )
                         Intent intent = new Intent(getApplicationContext(), lockActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.putExtra("packageName", packageName);
                         startActivity(intent);
                     }
                 }
-            }
-        }).start();
+            }).start();
+        }
     }
 
-    public String getForegroundPackageName () {
+    private String getForegroundPackageName() {
         String currentApp = null;
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -91,14 +107,12 @@ public class appService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Service has now started.");
+        testIntent = intent;
         return super.onStartCommand(intent, flags, startId);
     }
 
     private boolean isMyAppRunning () {
         ArrayList<String> appList = AppSQLiteDBHelper.getAllApps(this);
-        if (appList.contains(getForegroundPackageName())){
-            return true;
-        }
-        return false;
+        return appList.contains(getForegroundPackageName());
     }
 }
