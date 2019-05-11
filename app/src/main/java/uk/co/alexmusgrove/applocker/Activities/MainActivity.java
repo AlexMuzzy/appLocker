@@ -109,10 +109,11 @@ public class  MainActivity extends AppCompatActivity {
                 (position) -> launchAppIntent(appItems.get(position).getmPackageName())
         );
         adapter.setOnCheckedChangeListener((CompoundButton buttonView, int position, boolean isChecked) -> {
-            Log.i(TAG, "numberOfApps: " + AppSQLiteDBHelper.getAllApps(this).size());
+            Log.i(TAG, "numberOfLockedApps: " + AppSQLiteDBHelper.getAllApps(this).size());
             if (buttonView.isShown()) {
                 if (isChecked) {
                     addApp(appItems.get(position), position);
+                    Log.i(TAG, "buildRecyclerView: position " + position );
                 }
                 if(!isChecked){
                     removeApp(appItems.get(position), position);
@@ -159,7 +160,7 @@ public class  MainActivity extends AppCompatActivity {
     public void removeApp (appItem appItem, int position) {
         getContentResolver().delete(AppContentProvider.CONTENT_URI, AppSQLiteDBHelper.COLUMN_PACKAGENAME + " = '" + appItem.getmPackageName() + "'", null);
         Log.i(TAG, "removeApp: removed");
-        appItems.remove(position);
+        appItems.get(position).setmLocked(false);
     }
 
 

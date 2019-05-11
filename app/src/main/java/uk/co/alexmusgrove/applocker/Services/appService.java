@@ -26,6 +26,7 @@ public class appService extends Service {
     private static final String TAG = "uk.co.alexmusgrove.applocker.Services";
     private static boolean onState = false;
     Intent testIntent;
+
     ArrayList<unlockedApp> unlockedApps = new ArrayList<>();
 
     @Nullable
@@ -36,10 +37,10 @@ public class appService extends Service {
 
     @Override
     public void onCreate() {
-
+        Log.i(TAG, "unlockedApps: " + unlockedApps.size());
         if (!onState){
             onState = true;
-            Log.i(TAG, "Service has now started.");
+            Log.i(TAG, "Service onCreate");
             new Thread(() -> {
                 while(true) {
                     try {
@@ -105,14 +106,14 @@ public class appService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "Service has now started.");
+        Log.i(TAG, "Service onStartCommand");
         testIntent = intent;
         Bundle extras = testIntent.getExtras();
         if (extras != null){
             String unlockedPackageName = extras.getString("unlockedApp");
             if (unlockedPackageName != null){
                 unlockedApps.add(new unlockedApp(unlockedPackageName));
-                Log.i(TAG, "addedUnlockedApp: " + unlockedPackageName);
+                Log.i(TAG, "addedUnlockedApp: " + unlockedPackageName + ", new size is: " + unlockedApps.size());
             }
         }
         return super.onStartCommand(intent, flags, startId);

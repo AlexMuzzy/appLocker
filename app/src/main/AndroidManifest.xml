@@ -21,7 +21,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activities.SettingsActivity"></activity>
-        <activity android:name=".Activities.lockActivity"></activity>
+        <activity android:name=".Activities.lockActivity"
+            android:noHistory="true"></activity>
         <provider
             android:authorities="uk.co.alexmusgrove.applocker.Database.ContentProvider"
             android:name="uk.co.alexmusgrove.applocker.Database.AppContentProvider"
