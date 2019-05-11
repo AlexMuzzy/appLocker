@@ -3,7 +3,7 @@ package uk.co.alexmusgrove.applocker.Helpers;
 public class unlockedApp {
     private String packageName;
     private long unlockedAt;
-    private static final int DURATION = 30000; //30 Seconds
+    private static final int DURATION = 180000; //180 Seconds, 3 Minutes
 
     public unlockedApp(String packageName) {
         this.packageName = packageName;
@@ -14,4 +14,7 @@ public class unlockedApp {
         return ((unlockedAt + DURATION) > System.currentTimeMillis());
     }
 
+    public String getPackageName() {
+        return packageName;
+    }
 }

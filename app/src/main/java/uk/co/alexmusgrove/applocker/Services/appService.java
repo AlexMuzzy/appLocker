@@ -26,7 +26,7 @@ public class appService extends Service {
     private static final String TAG = "uk.co.alexmusgrove.applocker.Services";
     private static boolean onState = false;
     Intent testIntent;
-    ArrayList<unlockedApp> unlockedApps;
+    ArrayList<unlockedApp> unlockedApps = new ArrayList<>();
 
     @Nullable
     @Override
@@ -36,18 +36,10 @@ public class appService extends Service {
 
     @Override
     public void onCreate() {
-        Log.i(TAG, "Service has now started.");
 
-        Bundle extras = testIntent.getExtras();
-        if (extras != null){
-            String unlockedPackageName = extras.getString("packageName");
-            if (unlockedPackageName != null){
-                unlockedApps.add(new unlockedApp(unlockedPackageName));
-                Log.i(TAG, "addedUnlockedApp: " + unlockedPackageName);
-            }
-        }
         if (!onState){
             onState = true;
+            Log.i(TAG, "Service has now started.");
             new Thread(() -> {
                 while(true) {
                     try {
@@ -55,15 +47,21 @@ public class appService extends Service {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    for (unlockedApp i : unlockedApps){
+                        if (!i.isUnlocked()){
+                            unlockedApps.remove(i);
+                        }
+                    }
                     //REST OF CODE HERE//
                     String packageName = getForegroundPackageName();
                     Log.i(TAG, "ForegroundApp: " + getForegroundPackageName());
                     if (isMyAppRunning()){
-                        if (unlockedApps.size() > 0 && )
-                        Intent intent = new Intent(getApplicationContext(), lockActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        intent.putExtra("packageName", packageName);
-                        startActivity(intent);
+                        if (!isMyAppUnlocked(getForegroundPackageName())){
+                            Intent intent = new Intent(getApplicationContext(), lockActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intent.putExtra("packageName", packageName);
+                            startActivity(intent);
+                        }
                     }
                 }
             }).start();
@@ -104,15 +102,33 @@ public class appService extends Service {
         }
     }
 
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Service has now started.");
         testIntent = intent;
+        Bundle extras = testIntent.getExtras();
+        if (extras != null){
+            String unlockedPackageName = extras.getString("unlockedApp");
+            if (unlockedPackageName != null){
+                unlockedApps.add(new unlockedApp(unlockedPackageName));
+                Log.i(TAG, "addedUnlockedApp: " + unlockedPackageName);
+            }
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 
     private boolean isMyAppRunning () {
         ArrayList<String> appList = AppSQLiteDBHelper.getAllApps(this);
         return appList.contains(getForegroundPackageName());
+    }
+
+    private boolean isMyAppUnlocked (String packageName) {
+        for (unlockedApp i : unlockedApps){
+            if (i.getPackageName().equals(packageName)){
+                return true;
+            }
+        }
+        return false;
     }
 }

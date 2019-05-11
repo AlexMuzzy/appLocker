@@ -31,6 +31,7 @@ public class lockActivity extends AppCompatActivity {
            // your handler code here
             Intent unlockintent = new Intent(this, appService.class);
             unlockintent.putExtra("unlockedApp", intent.getStringExtra("packageName"));
+            finish();
             startService(unlockintent);
         });
     }
