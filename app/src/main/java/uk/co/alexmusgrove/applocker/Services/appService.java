@@ -4,7 +4,7 @@ import android.app.ActivityManager;
 import android.app.Service;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
-import android.content.Context;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import uk.co.alexmusgrove.applocker.Activities.MainActivity;
 import uk.co.alexmusgrove.applocker.Activities.lockActivity;
+import uk.co.alexmusgrove.applocker.Database.AppContentProvider;
 import uk.co.alexmusgrove.applocker.Database.AppSQLiteDBHelper;
 import uk.co.alexmusgrove.applocker.Helpers.unlockedApp;
 
@@ -27,8 +27,6 @@ public class appService extends Service {
     private static boolean onState = false;
     Intent testIntent;
 
-    ArrayList<unlockedApp> unlockedApps = new ArrayList<>();
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -37,12 +35,14 @@ public class appService extends Service {
 
     @Override
     public void onCreate() {
-        Log.i(TAG, "unlockedApps: " + unlockedApps.size());
         if (!onState){
             onState = true;
             Log.i(TAG, "Service onCreate");
             new Thread(() -> {
                 while(true) {
+                    ArrayList<unlockedApp> unlockedApps = AppSQLiteDBHelper.getAllUnlockedApps(this);
+                    Log.i(TAG, "unlockedApps: " + unlockedApps.size());
+
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -50,7 +50,11 @@ public class appService extends Service {
                     }
                     for (unlockedApp i : unlockedApps){
                         if (!i.isUnlocked()){
-                            unlockedApps.remove(i);
+                            getContentResolver().delete(AppContentProvider.UNLOCKEDAPP_CONTENT_URI,
+                                    AppSQLiteDBHelper.COLUMN_PACKAGENAME + " = '" + i.getPackageName() + "'",
+                                    null
+                            );
+                            Log.i(TAG, "delete: " + i.getPackageName());
                         }
                     }
                     //REST OF CODE HERE//
@@ -112,8 +116,7 @@ public class appService extends Service {
         if (extras != null){
             String unlockedPackageName = extras.getString("unlockedApp");
             if (unlockedPackageName != null){
-                unlockedApps.add(new unlockedApp(unlockedPackageName));
-                Log.i(TAG, "addedUnlockedApp: " + unlockedPackageName + ", new size is: " + unlockedApps.size());
+                addUnlockedApp(unlockedPackageName);
             }
         }
         return super.onStartCommand(intent, flags, startId);
@@ -125,11 +128,20 @@ public class appService extends Service {
     }
 
     private boolean isMyAppUnlocked (String packageName) {
+        ArrayList<unlockedApp> unlockedApps = AppSQLiteDBHelper.getAllUnlockedApps(this);
         for (unlockedApp i : unlockedApps){
             if (i.getPackageName().equals(packageName)){
                 return true;
             }
         }
         return false;
+    }
+
+    public void addUnlockedApp (String unlockedApp) {
+        ContentValues values = new ContentValues();
+        unlockedApp unlockedApp1 = new unlockedApp(unlockedApp);
+        values.put(AppSQLiteDBHelper.COLUMN_PACKAGENAME, unlockedApp1.getPackageName());
+        values.put(AppSQLiteDBHelper.COLUMN_UNLOCKEDAT, unlockedApp1.getUnlockedAt());
+        getContentResolver().insert(AppContentProvider.APP_CONTENT_URI, values);
     }
 }

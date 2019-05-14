@@ -10,11 +10,20 @@ public class unlockedApp {
         this.unlockedAt = System.currentTimeMillis();
     }
 
+    public unlockedApp(String packageName, long unlockedAt){
+        this.packageName = packageName;
+        this.unlockedAt = unlockedAt;
+    }
+
     public boolean isUnlocked () {
         return ((unlockedAt + DURATION) > System.currentTimeMillis());
     }
 
     public String getPackageName() {
         return packageName;
+    }
+
+    public long getUnlockedAt() {
+        return unlockedAt;
     }
 }

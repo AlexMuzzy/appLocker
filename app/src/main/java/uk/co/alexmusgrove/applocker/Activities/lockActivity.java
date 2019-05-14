@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,10 +26,11 @@ public class lockActivity extends AppCompatActivity {
         Intent intent = getIntent();
         generateAppDetails(intent.getStringExtra("packageName"));
 
-        final Button button = (Button) findViewById(R.id.authenticate_button);
+        final Button button = findViewById(R.id.authenticate_button);
+        final EditText editText = findViewById(R.id.password_editText);
 
         button.setOnClickListener(v -> {
-           // your handler code here
+            
             Intent unlockintent = new Intent(this, appService.class);
             unlockintent.putExtra("unlockedApp", intent.getStringExtra("packageName"));
             finish();

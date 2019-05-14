@@ -153,12 +153,12 @@ public class  MainActivity extends AppCompatActivity {
     public void addApp (appItem appItem, int position) {
         ContentValues values = new ContentValues();
         values.put(AppSQLiteDBHelper.COLUMN_PACKAGENAME, appItem.getmPackageName());
-        getContentResolver().insert(AppContentProvider.CONTENT_URI, values);
+        getContentResolver().insert(AppContentProvider.APP_CONTENT_URI, values);
         appItems.get(position).setmLocked(true);
     }
 
     public void removeApp (appItem appItem, int position) {
-        getContentResolver().delete(AppContentProvider.CONTENT_URI, AppSQLiteDBHelper.COLUMN_PACKAGENAME + " = '" + appItem.getmPackageName() + "'", null);
+        getContentResolver().delete(AppContentProvider.APP_CONTENT_URI, AppSQLiteDBHelper.COLUMN_PACKAGENAME + " = '" + appItem.getmPackageName() + "'", null);
         Log.i(TAG, "removeApp: removed");
         appItems.get(position).setmLocked(false);
     }

@@ -28,17 +28,11 @@ public class permissionFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Usage Access");
         builder.setMessage(R.string.usage_permission)
-                .setPositiveButton("Open Settings", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-                        startActivity(intent);
-                    }
+                .setPositiveButton("Open Settings", (dialog, id) -> {
+                    Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                    startActivity(intent);
                 })
-                .setNegativeButton("Close App", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        getActivity().finish();
-                    }
-                });
+                .setNegativeButton("Close App", (dialog, id) -> getActivity().finish());
         // Create the AlertDialog object and return it
         return builder.create();
     }
