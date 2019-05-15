@@ -38,13 +38,14 @@ public class appService extends Service {
         if (!onState){
             onState = true;
             Log.i(TAG, "Service onCreate");
+            //separate thread to call the service
             new Thread(() -> {
-                while(true) {
+                while(true) {//recurring loop
                     ArrayList<unlockedApp> unlockedApps = AppSQLiteDBHelper.getAllUnlockedApps(this);
                     Log.i(TAG, "unlockedApps: " + unlockedApps.size());
 
                     try {
-                        Thread.sleep(500);
+                        Thread.sleep(500);//delay the loop for every .5 of a second
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -53,19 +54,19 @@ public class appService extends Service {
                             getContentResolver().delete(AppContentProvider.UNLOCKEDAPP_CONTENT_URI,
                                     AppSQLiteDBHelper.COLUMN_PACKAGENAME + " = '" + i.getPackageName() + "'",
                                     null
-                            );
+                            );//if the app has expired the unlock, then delete the unlock
                             Log.i(TAG, "delete: " + i.getPackageName());
                         }
                     }
                     //REST OF CODE HERE//
                     String packageName = getForegroundPackageName();
                     Log.i(TAG, "ForegroundApp: " + getForegroundPackageName());
-                    if (isMyAppRunning()){
-                        if (!isMyAppUnlocked(getForegroundPackageName())){
+                    if (isMyAppRunning()){//check if it is in foreground
+                        if (!isMyAppUnlocked(getForegroundPackageName())){// check app if it is not unlocked
                             Intent intent = new Intent(getApplicationContext(), lockActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             intent.putExtra("packageName", packageName);
-                            startActivity(intent);
+                            startActivity(intent);//start lock with app data
                         }
                     }
                 }

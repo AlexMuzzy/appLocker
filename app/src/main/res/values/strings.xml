@@ -5,4 +5,6 @@
     <string name="usage_permission">Please grant usage access permission to this application.</string>
     <string name="password">Password</string>
     <string name="newPassword">Type here...</string>
+    <string name="appLockerChannel">appLocker</string>
+    <string name="label_share">Share</string>
 </resources>

@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bwq="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_share"
+        android:title="@string/label_share"
+        bwq:actionProviderClass="android.support.v7.widget.ShareActionProvider"
+        bwq:showAsAction="always"/>
     <item android:title="@string/main_menu"
         android:id="@+id/main_item"/>
+    <item android:title="User Guide"
+        android:id="@+id/user_guide_item"/>
+
 </menu>

@@ -20,6 +20,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activities.SettingsActivity"></activity>
+        <activity android:name=".Activities.UserGuideActivity"></activity>
         <activity android:name=".Activities.lockActivity"
             android:noHistory="true"></activity>
         <provider

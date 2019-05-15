@@ -4,4 +4,6 @@
 
     <item android:title="@string/settings"
         android:id="@+id/settings_item"/>
+    <item android:title="User Guide"
+        android:id="@+id/user_guide_item"/>
 </menu>

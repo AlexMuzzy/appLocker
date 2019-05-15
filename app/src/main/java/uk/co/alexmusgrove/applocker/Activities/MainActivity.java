@@ -1,6 +1,9 @@
 package uk.co.alexmusgrove.applocker.Activities;
 
 import android.app.AppOpsManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
@@ -68,11 +71,21 @@ public class  MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
 
-        if(item.getItemId()==R.id.settings_item){
+        if(item.getItemId()==R.id.settings_item) {
             Intent settingsIntent = new Intent(this, SettingsActivity.class);
             startActivity(settingsIntent);
             return true;
         }
+        if (item.getItemId()==R.id.user_guide_item) {
+            Intent userGuideIntent = new Intent(this, UserGuideActivity.class);
+            startActivity(userGuideIntent);
+            return true;
+        }
+//        } else if (item.getItemId()==R.id.user_guide_item){
+//            Intent userGuideIntent = new Intent(this, UserGuideActivity.class);
+//            startActivity(userGuideIntent);
+//            return true;
+//        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -184,8 +197,30 @@ public class  MainActivity extends AppCompatActivity {
 
     private boolean hasPasswordSet () {
         String password = settingsPreferences.getPassword(this);
-        Boolean test = (!password.equals(null));
         return (!password.equals(null));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        int notifyID = 1;
+        String CHANNEL_ID = "my_channel_1";// The id of the channel.
+        CharSequence name = getString(R.string.appLockerChannel);// The user-visible name of the channel.
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+        NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
+// Create a notification and set the notification channel.
+        Notification notification = new Notification.Builder(MainActivity.this, CHANNEL_ID)
+                .setContentTitle("Locked Apps")
+                .setContentText("You currently have " + AppSQLiteDBHelper.getAllApps(this).size() + " locked apps.")
+                .setSmallIcon(R.drawable.ic_build_black_24dp)
+                .setChannelId(CHANNEL_ID)
+                .build();
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.createNotificationChannel(mChannel);
+
+// Issue the notification.
+        mNotificationManager.notify(notifyID , notification);
     }
 }
 
