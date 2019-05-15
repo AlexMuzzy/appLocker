@@ -9,6 +9,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,7 +26,9 @@ import java.util.List;
 import uk.co.alexmusgrove.applocker.Adapters.appAdapter;
 import uk.co.alexmusgrove.applocker.Database.AppContentProvider;
 import uk.co.alexmusgrove.applocker.Database.AppSQLiteDBHelper;
+import uk.co.alexmusgrove.applocker.Fragments.passwordFragment;
 import uk.co.alexmusgrove.applocker.Fragments.permissionFragment;
+import uk.co.alexmusgrove.applocker.Preferences.settingsPreferences;
 import uk.co.alexmusgrove.applocker.R;
 import uk.co.alexmusgrove.applocker.Helpers.appItem;
 import uk.co.alexmusgrove.applocker.Services.appService;
@@ -43,9 +46,16 @@ public class  MainActivity extends AppCompatActivity {
             permissionFragment dialog = permissionFragment.newInstance();
             dialog.show(this.getSupportFragmentManager(), "permissionFragment");
         }
+
         generateAppItems();
         buildRecyclerView();
         startAppService();
+
+        if(!hasPasswordSet()){
+            passwordFragment dialog = passwordFragment.newInstance();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            dialog.show(fragmentManager,"passwordFragment");
+        }
     }
 
     //Overriding methods for options menu
@@ -70,17 +80,12 @@ public class  MainActivity extends AppCompatActivity {
         final PackageManager pm = getPackageManager();
         //get a list of installed apps.
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-        Log.i(TAG, "testload: ");
         for (ApplicationInfo packageInfo : packages) {
             //filter all systems applications out of loop
             if ((packageInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
                 //grab application label from package name
                 String appName = (String) pm.getApplicationLabel(packageInfo);
                 ArrayList<String> appList = AppSQLiteDBHelper.getAllApps(this);
-                for (String app : appList) {
-                    Log.i(TAG, "generateAppItems: " + app);
-                }
-                Log.i(TAG, "generateAppItems: " + appList.size());
                 //append details to appItem class
                 appItems.add(new appItem(
                         appName, //name of application
@@ -109,11 +114,9 @@ public class  MainActivity extends AppCompatActivity {
                 (position) -> launchAppIntent(appItems.get(position).getmPackageName())
         );
         adapter.setOnCheckedChangeListener((CompoundButton buttonView, int position, boolean isChecked) -> {
-            Log.i(TAG, "numberOfLockedApps: " + AppSQLiteDBHelper.getAllApps(this).size());
             if (buttonView.isShown()) {
                 if (isChecked) {
                     addApp(appItems.get(position), position);
-                    Log.i(TAG, "buildRecyclerView: position " + position );
                 }
                 if(!isChecked){
                     removeApp(appItems.get(position), position);
@@ -177,6 +180,12 @@ public class  MainActivity extends AppCompatActivity {
         AppOpsManager appOpsManager = (AppOpsManager) this.getSystemService(Context.APP_OPS_SERVICE);
         int mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), getApplicationContext().getPackageName());
         return (mode == AppOpsManager.MODE_ALLOWED);
+    }
+
+    private boolean hasPasswordSet () {
+        String password = settingsPreferences.getPassword(this);
+        Boolean test = (!password.equals(null));
+        return (!password.equals(null));
     }
 }
 

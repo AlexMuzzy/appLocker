@@ -44,7 +44,7 @@ public class appService extends Service {
                     Log.i(TAG, "unlockedApps: " + unlockedApps.size());
 
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(500);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

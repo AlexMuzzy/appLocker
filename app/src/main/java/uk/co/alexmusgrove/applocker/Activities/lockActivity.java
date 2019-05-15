@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,28 +15,48 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import uk.co.alexmusgrove.applocker.Preferences.settingsPreferences;
 import uk.co.alexmusgrove.applocker.R;
 import uk.co.alexmusgrove.applocker.Services.appService;
 
 public class lockActivity extends AppCompatActivity {
 
+    private static final String TAG = "uk.co.alexmusgrove.applocker.Activities";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_lock);
+        Log.i(TAG, "password: " + settingsPreferences.getPassword(this));
 
         Intent intent = getIntent();
         generateAppDetails(intent.getStringExtra("packageName"));
 
-        final Button button = findViewById(R.id.authenticate_button);
         final EditText editText = findViewById(R.id.password_editText);
 
-        button.setOnClickListener(v -> {
-            
-            Intent unlockintent = new Intent(this, appService.class);
-            unlockintent.putExtra("unlockedApp", intent.getStringExtra("packageName"));
-            finish();
-            startService(unlockintent);
+        editText.setOnKeyListener((v, keyCode, event) -> {
+            if (event.getAction() == KeyEvent.ACTION_DOWN)
+            {
+                switch (keyCode)
+                {
+                    case KeyEvent.KEYCODE_DPAD_CENTER:
+                    case KeyEvent.KEYCODE_ENTER:
+                        if (isPasswordCorrect(editText.getText().toString())){
+                            Intent unlockintent = new Intent(getApplicationContext(), appService.class);
+                            unlockintent.putExtra("unlockedApp", intent.getStringExtra("packageName"));
+                            finish();
+                            startService(unlockintent);
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Authentication failed.", Toast.LENGTH_SHORT);
+                        }
+                        return true;
+                    default:
+                        break;
+                }
+            }
+            return false;
         });
     }
 
@@ -59,5 +81,10 @@ public class lockActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+    }
+
+    public boolean isPasswordCorrect (String password) {
+        String testPassword = settingsPreferences.getPassword(this);
+        return password.equals(testPassword);
     }
 }
