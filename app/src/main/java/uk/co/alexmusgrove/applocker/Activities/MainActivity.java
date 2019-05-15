@@ -81,14 +81,13 @@ public class  MainActivity extends AppCompatActivity {
             startActivity(userGuideIntent);
             return true;
         }
-//        } else if (item.getItemId()==R.id.user_guide_item){
-//            Intent userGuideIntent = new Intent(this, UserGuideActivity.class);
-//            startActivity(userGuideIntent);
-//            return true;
-//        }
         return super.onOptionsItemSelected(item);
     }
 
+
+    /**
+     * generate all the appitems for the recycler view
+     */
     public void generateAppItems () {
         final PackageManager pm = getPackageManager();
         //get a list of installed apps.
@@ -110,6 +109,10 @@ public class  MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * building recycler view using generate app items and creating
+     * listeners
+     */
     public void buildRecyclerView () {
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         // use this setting to improve performance if you know that changes
@@ -144,6 +147,11 @@ public class  MainActivity extends AppCompatActivity {
         });
     }
 
+
+    /**
+     * 
+     * @param packageName
+     */
     public void launchAppIntent(String packageName) {
         Intent intent = new Intent();
         intent.setPackage(packageName);

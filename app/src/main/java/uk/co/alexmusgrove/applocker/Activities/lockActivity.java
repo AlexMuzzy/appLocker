@@ -60,6 +60,14 @@ public class lockActivity extends AppCompatActivity {
         });
     }
 
+
+    /**
+     * Name of the package
+     * @param packageName
+     *
+     * generateAppDetails returns all the different UI elements filled with data specific
+     * to the application passed through
+     */
     public void generateAppDetails (String packageName) {
         PackageManager packageManager = getPackageManager();
 
@@ -83,6 +91,11 @@ public class lockActivity extends AppCompatActivity {
 
     }
 
+    /**
+     *
+     * @param password
+     * @return returns whether the password entered matches the password set.
+     */
     public boolean isPasswordCorrect (String password) {
         String testPassword = settingsPreferences.getPassword(this);
         return password.equals(testPassword);
