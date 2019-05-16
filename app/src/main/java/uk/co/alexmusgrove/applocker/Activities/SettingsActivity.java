@@ -24,15 +24,14 @@ public class SettingsActivity extends AppCompatActivity {
         setTitle("Settings");
         setContentView(R.layout.activity_settings);
         CardView resetpassword_card = this.findViewById(R.id.resetpassword_view);
-
-        resetpassword_card.setOnClickListener(v -> {//listener reset password dialog
+        resetpassword_card.setOnClickListener(v -> {
             passwordFragment dialog = passwordFragment.newInstance();
             FragmentManager fragmentManager = getSupportFragmentManager();
             dialog.show(fragmentManager,"passwordFragment");
         });
-
     }
 
+    ShareActionProvider shareActionProvider = null;
     //Overriding methods for options menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
