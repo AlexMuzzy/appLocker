@@ -206,7 +206,7 @@ public class  MainActivity extends AppCompatActivity {
         int notifyID = 1;
         String CHANNEL_ID = "my_channel_1";// The id of the channel.
         CharSequence name = getString(R.string.appLockerChannel);// The user-visible name of the channel.
-        int importance = NotificationManager.IMPORTANCE_HIGH;
+        int importance = NotificationManager.IMPORTANCE_MIN;
         NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
 // Create a notification and set the notification channel.
         Notification notification = new Notification.Builder(MainActivity.this, CHANNEL_ID)
