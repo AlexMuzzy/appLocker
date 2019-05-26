@@ -46,7 +46,13 @@ public class lockActivity extends AppCompatActivity {
                         if (isPasswordCorrect(editText.getText().toString())){
                             Intent unlockintent = new Intent(getApplicationContext(), appService.class);
                             unlockintent.putExtra("unlockedApp", intent.getStringExtra("packageName"));
-                            finish();
+
+                            if(android.os.Build.VERSION.SDK_INT >= 21) {
+                                finishAndRemoveTask();
+                            } else {
+                                finish();
+                            }
+
                             startService(unlockintent);
                         } else {
                             Toast.makeText(getApplicationContext(), "Authentication failed.", Toast.LENGTH_SHORT);

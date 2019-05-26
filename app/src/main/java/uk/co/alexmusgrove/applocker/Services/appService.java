@@ -45,7 +45,7 @@ public class appService extends Service {
                     Log.i(TAG, "unlockedApps: " + unlockedApps.size());
 
                     try {
-                        Thread.sleep(500);//delay the loop for every .5 of a second
+                        Thread.sleep(1000);//delay the loop for every second
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -65,6 +65,7 @@ public class appService extends Service {
                         if (!isMyAppUnlocked(getForegroundPackageName())){// check app if it is not unlocked
                             Intent intent = new Intent(getApplicationContext(), lockActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                             intent.putExtra("packageName", packageName);
                             startActivity(intent);//start lock with app data
                         }

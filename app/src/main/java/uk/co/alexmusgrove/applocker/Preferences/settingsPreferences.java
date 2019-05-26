@@ -16,7 +16,7 @@ public class settingsPreferences {
     }
 
     public static String getPassword(Context context) {
-        return getPrefs(context).getString("password_key", "password");
+        return getPrefs(context).getString("password_key", null);
     }
 
     public static void setPassword(Context context, String input) {

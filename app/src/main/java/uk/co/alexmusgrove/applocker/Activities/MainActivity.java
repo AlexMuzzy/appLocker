@@ -24,6 +24,8 @@ import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import uk.co.alexmusgrove.applocker.Adapters.appAdapter;
@@ -81,11 +83,6 @@ public class  MainActivity extends AppCompatActivity {
             startActivity(userGuideIntent);
             return true;
         }
-//        } else if (item.getItemId()==R.id.user_guide_item){
-//            Intent userGuideIntent = new Intent(this, UserGuideActivity.class);
-//            startActivity(userGuideIntent);
-//            return true;
-//        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -108,6 +105,11 @@ public class  MainActivity extends AppCompatActivity {
                 ));
             }
         }
+        Collections.sort(appItems, (Comparator) (o1, o2) -> {
+            appItem app1 = (appItem) o1;
+            appItem app2 = (appItem) o2;
+            return app1.getmAppName().compareToIgnoreCase(app2.getmAppName());
+        });
     }
 
     public void buildRecyclerView () {
@@ -196,8 +198,7 @@ public class  MainActivity extends AppCompatActivity {
     }
 
     private boolean hasPasswordSet () {
-        String password = settingsPreferences.getPassword(this);
-        return (!password.equals(null));
+        return !(settingsPreferences.getPassword(this) == null);
     }
 
     @Override
