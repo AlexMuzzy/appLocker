@@ -12,6 +12,8 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -52,6 +54,7 @@ public class  MainActivity extends AppCompatActivity {
             dialog.show(this.getSupportFragmentManager(), "permissionFragment");
         }
 
+        generateBottomNavBar();
         generateAppItems();
         buildRecyclerView();
         startAppService();
@@ -61,29 +64,6 @@ public class  MainActivity extends AppCompatActivity {
             FragmentManager fragmentManager = getSupportFragmentManager();
             dialog.show(fragmentManager,"passwordFragment");
         }
-    }
-
-    //Overriding methods for options menu
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-
-        if(item.getItemId()==R.id.settings_item) {
-            Intent settingsIntent = new Intent(this, SettingsActivity.class);
-            startActivity(settingsIntent);
-            return true;
-        }
-        if (item.getItemId()==R.id.user_guide_item) {
-            Intent userGuideIntent = new Intent(this, UserGuideActivity.class);
-            startActivity(userGuideIntent);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     public void generateAppItems () {
@@ -97,12 +77,14 @@ public class  MainActivity extends AppCompatActivity {
                 String appName = (String) pm.getApplicationLabel(packageInfo);
                 ArrayList<String> appList = AppSQLiteDBHelper.getAllApps(this);
                 //append details to appItem class
-                appItems.add(new appItem(
-                        appName, //name of application
-                        packageInfo.packageName, // unique package name of application
-                        packageInfo.loadIcon(pm), // application icon
-                        appList.contains(packageInfo.packageName) // app lock switch state
-                ));
+                if (!packageInfo.packageName.equals("uk.co.alexmusgrove.applocker")){
+                    appItems.add(new appItem(
+                            appName, //name of application
+                            packageInfo.packageName, // unique package name of application
+                            packageInfo.loadIcon(pm), // application icon
+                            appList.contains(packageInfo.packageName) // app lock switch state
+                    ));
+                }
             }
         }
         Collections.sort(appItems, (Comparator) (o1, o2) -> {
@@ -193,12 +175,36 @@ public class  MainActivity extends AppCompatActivity {
 
     private boolean hasUsageStatsPermission () {
         AppOpsManager appOpsManager = (AppOpsManager) this.getSystemService(Context.APP_OPS_SERVICE);
-        int mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), getApplicationContext().getPackageName());
+        int mode = 0;
+        if (appOpsManager != null) {
+            mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), getApplicationContext().getPackageName());
+        }
         return (mode == AppOpsManager.MODE_ALLOWED);
     }
 
     private boolean hasPasswordSet () {
         return !(settingsPreferences.getPassword(this) == null);
+    }
+
+    public void generateBottomNavBar () {
+        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_user:
+                        Toast.makeText(MainActivity.this, "User Apps", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.action_system:
+                        Toast.makeText(MainActivity.this, "System Apps", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.action_settings:
+                        Toast.makeText(MainActivity.this, "Settings", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                return true;
+            }
+        });
     }
 
     @Override
@@ -218,7 +224,9 @@ public class  MainActivity extends AppCompatActivity {
                 .build();
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.createNotificationChannel(mChannel);
+        if (mNotificationManager != null) {
+            mNotificationManager.createNotificationChannel(mChannel);
+        }
 
 // Issue the notification.
         mNotificationManager.notify(notifyID , notification);
