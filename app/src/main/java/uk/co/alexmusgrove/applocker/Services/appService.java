@@ -121,7 +121,7 @@ public class appService extends Service {
                 addUnlockedApp(unlockedPackageName);
             }
         }
-        return super.onStartCommand(intent, flags, startId);
+        return super.onStartCommand(intent, flags, START_STICKY);
     }
 
     private boolean isMyAppRunning () {

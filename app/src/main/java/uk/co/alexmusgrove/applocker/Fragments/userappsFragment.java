@@ -40,8 +40,13 @@ public class userappsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        generateAppItems();
         buildRecyclerView();
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        generateAppItems();
     }
 
     private ArrayList<appItem> appItems = new ArrayList<>();

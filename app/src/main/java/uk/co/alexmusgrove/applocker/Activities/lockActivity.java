@@ -55,7 +55,7 @@ public class lockActivity extends AppCompatActivity {
 
                             startService(unlockintent);
                         } else {
-                            Toast.makeText(getApplicationContext(), "Authentication failed.", Toast.LENGTH_SHORT);
+                            Toast.makeText(getApplicationContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
                         return true;
                     default:

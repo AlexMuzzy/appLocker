@@ -28,7 +28,6 @@
             android:name="uk.co.alexmusgrove.applocker.Database.AppContentProvider"
         />
         <service android:name=".Services.appService"></service>
-
     </application>
 
 </manifest>

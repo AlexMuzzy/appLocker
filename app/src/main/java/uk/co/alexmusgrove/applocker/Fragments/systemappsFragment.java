@@ -42,14 +42,16 @@ public class systemappsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ArrayList<appItem> appItems = ((HomeActivity)this.getActivity()).getAppItems();
         buildRecyclerView();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        generateAppItems();
     }
+
+    private ArrayList<appItem> appItems = new ArrayList<>();
 
     public void buildRecyclerView () {
         RecyclerView recyclerView = getView().findViewById(R.id.user_recycler_view);
@@ -117,5 +119,33 @@ public class systemappsFragment extends Fragment {
     public void removeApp (appItem appItem, int position) {
         getActivity().getContentResolver().delete(AppContentProvider.APP_CONTENT_URI, AppSQLiteDBHelper.COLUMN_PACKAGENAME + " = '" + appItem.getmPackageName() + "'", null);
         appItems.get(position).setmLocked(false);
+    }
+
+    public void generateAppItems () {
+        final PackageManager pm = getActivity().getPackageManager();
+        //get a list of installed apps.
+        List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+        for (ApplicationInfo packageInfo : packages) {
+            //filter all systems applications out of loop
+            if (!((packageInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0)) {
+                //grab application label from package name
+                String appName = (String) pm.getApplicationLabel(packageInfo);
+                ArrayList<String> appList = AppSQLiteDBHelper.getAllApps(getActivity());
+                //append details to appItem class
+                if (!packageInfo.packageName.equals("uk.co.alexmusgrove.applocker")){
+                    appItems.add(new appItem(
+                            appName, //name of application
+                            packageInfo.packageName, // unique package name of application
+                            packageInfo.loadIcon(pm), // application icon
+                            appList.contains(packageInfo.packageName) // app lock switch state
+                    ));
+                }
+            }
+        }
+        Collections.sort(appItems, (Comparator) (o1, o2) -> {
+            appItem app1 = (appItem) o1;
+            appItem app2 = (appItem) o2;
+            return app1.getmAppName().compareToIgnoreCase(app2.getmAppName());
+        });
     }
 }
