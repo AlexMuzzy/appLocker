@@ -1,11 +1,17 @@
 package uk.co.alexmusgrove.applocker.Services;
 
 import android.app.ActivityManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -16,14 +22,16 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import uk.co.alexmusgrove.applocker.Activities.HomeActivity;
+import uk.co.alexmusgrove.applocker.Activities.MainActivity;
 import uk.co.alexmusgrove.applocker.Activities.lockActivity;
 import uk.co.alexmusgrove.applocker.Database.AppContentProvider;
 import uk.co.alexmusgrove.applocker.Database.AppSQLiteDBHelper;
 import uk.co.alexmusgrove.applocker.Helpers.unlockedApp;
+import uk.co.alexmusgrove.applocker.R;
 
 public class appService extends Service {
 
-    private static final String TAG = "uk.co.alexmusgrove.applocker.Services";
     private static boolean onState = false;
     Intent testIntent;
 
@@ -37,12 +45,10 @@ public class appService extends Service {
     public void onCreate() {
         if (!onState){
             onState = true;
-            Log.i(TAG, "Service onCreate");
             //separate thread to call the service
             new Thread(() -> {
                 while(true) {//recurring loop
                     ArrayList<unlockedApp> unlockedApps = AppSQLiteDBHelper.getAllUnlockedApps(this);
-                    Log.i(TAG, "unlockedApps: " + unlockedApps.size());
 
                     try {
                         Thread.sleep(1000);//delay the loop for every second
@@ -55,12 +61,10 @@ public class appService extends Service {
                                     AppSQLiteDBHelper.COLUMN_PACKAGENAME + " = '" + i.getPackageName() + "'",
                                     null
                             );//if the app has expired the unlock, then delete the unlock
-                            Log.i(TAG, "delete: " + i.getPackageName());
                         }
                     }
                     //REST OF CODE HERE//
                     String packageName = getForegroundPackageName();
-                    Log.i(TAG, "ForegroundApp: " + getForegroundPackageName());
                     if (isMyAppRunning()){//check if it is in foreground
                         if (!isMyAppUnlocked(getForegroundPackageName())){// check app if it is not unlocked
                             Intent intent = new Intent(getApplicationContext(), lockActivity.class);
@@ -75,6 +79,26 @@ public class appService extends Service {
         }
     }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        testIntent = intent;
+        Bundle extras = testIntent.getExtras();
+        if (extras != null){
+            String unlockedPackageName = extras.getString("unlockedApp");
+            if (unlockedPackageName != null){
+                addUnlockedApp(unlockedPackageName);
+            }
+        }
+        createNotificationChannel();
+        Intent notificationIntent = new Intent(this, HomeActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,
+                0, notificationIntent, 0);
+        Notification notification = buildForegroundNotification(pendingIntent);
+
+        startForeground(1, notification);
+
+        return START_STICKY;
+    }
     private String getForegroundPackageName() {
         String currentApp = null;
 
@@ -110,19 +134,7 @@ public class appService extends Service {
     }
 
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "Service onStartCommand");
-        testIntent = intent;
-        Bundle extras = testIntent.getExtras();
-        if (extras != null){
-            String unlockedPackageName = extras.getString("unlockedApp");
-            if (unlockedPackageName != null){
-                addUnlockedApp(unlockedPackageName);
-            }
-        }
-        return super.onStartCommand(intent, flags, START_STICKY);
-    }
+
 
     private boolean isMyAppRunning () {
         ArrayList<String> appList = AppSQLiteDBHelper.getAllApps(this);
@@ -145,5 +157,39 @@ public class appService extends Service {
         values.put(AppSQLiteDBHelper.COLUMN_PACKAGENAME, unlockedApp1.getPackageName());
         values.put(AppSQLiteDBHelper.COLUMN_UNLOCKEDAT, unlockedApp1.getUnlockedAt());
         getContentResolver().insert(AppContentProvider.APP_CONTENT_URI, values);
+    }
+
+    String CHANNEL_ID = "my_channel_1";// The id of the channel.
+
+    public Notification buildForegroundNotification (PendingIntent pendingIntent) {
+        Integer numberOfApps = AppSQLiteDBHelper.getAllApps(this).size();
+        String appSizeString = (numberOfApps > 1) ? " locked apps." : " locked app.";
+        // Create a notification and set the notification channel.
+        Notification notification = new Notification.Builder(this, CHANNEL_ID)
+                .setContentTitle("Locked Apps")
+                .setContentText("You currently have " + numberOfApps + appSizeString)
+                .setSmallIcon(R.drawable.ic_build_black_24dp)
+                .setChannelId(CHANNEL_ID)
+                .setContentIntent(pendingIntent)
+                .build();
+        return notification;
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel serviceChannel = new NotificationChannel(
+                    CHANNEL_ID,
+                    getString(R.string.appLockerChannel),
+                    NotificationManager.IMPORTANCE_MIN
+            );
+
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(serviceChannel);
+        }
+    }
+
+    public void stopForegroundService () {
+        stopForeground(true);
+        stopSelf();
     }
 }

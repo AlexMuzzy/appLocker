@@ -49,8 +49,6 @@ public class HomeActivity extends AppCompatActivity{
         }
         generateBottomNavBar();
         generateAppItems();
-        startAppService();
-
         if(!hasPasswordSet()){
             passwordFragment dialog = passwordFragment.newInstance();
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -116,26 +114,7 @@ public class HomeActivity extends AppCompatActivity{
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        int notifyID = 1;
-        String CHANNEL_ID = "my_channel_1";// The id of the channel.
-        CharSequence name = getString(R.string.appLockerChannel);// The user-visible name of the channel.
-        int importance = NotificationManager.IMPORTANCE_MIN;
-        NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
-// Create a notification and set the notification channel.
-        Notification notification = new Notification.Builder(HomeActivity.this, CHANNEL_ID)
-                .setContentTitle("Locked Apps")
-                .setContentText("You currently have " + AppSQLiteDBHelper.getAllApps(this).size() + " locked apps.")
-                .setSmallIcon(R.drawable.ic_build_black_24dp)
-                .setChannelId(CHANNEL_ID)
-                .build();
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (mNotificationManager != null) {
-            mNotificationManager.createNotificationChannel(mChannel);
-        }
-
-// Issue the notification.
-        mNotificationManager.notify(notifyID , notification);
+        startAppService();
     }
 
     private boolean loadFragment(Fragment fragment){
