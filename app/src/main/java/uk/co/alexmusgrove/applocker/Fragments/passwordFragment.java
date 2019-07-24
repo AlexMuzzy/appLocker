@@ -48,8 +48,7 @@ public class passwordFragment extends DialogFragment {
         builder
                 .setPositiveButton("Set Password", (dialog, id) -> {
                     settingsPreferences.setPassword(context, editText.getText().toString());
-                    Log.i(TAG, "password: " + editText.getText().toString());
-                    })
+                })
 
 
                 .setNegativeButton("Close App", (dialog, id) -> getActivity().finish());

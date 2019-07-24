@@ -21,7 +21,6 @@ import uk.co.alexmusgrove.applocker.Services.appService;
 
 public class lockActivity extends AppCompatActivity {
 
-    private static final String TAG = "uk.co.alexmusgrove.applocker.Activities";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +28,6 @@ public class lockActivity extends AppCompatActivity {
 
 
         setContentView(R.layout.activity_lock);
-        Log.i(TAG, "password: " + settingsPreferences.getPassword(this));
-
         Intent intent = getIntent();
         generateAppDetails(intent.getStringExtra("packageName"));
 
@@ -39,8 +36,7 @@ public class lockActivity extends AppCompatActivity {
         editText.setOnKeyListener((v, keyCode, event) -> {
             if (event.getAction() == KeyEvent.ACTION_DOWN)
             {
-                switch (keyCode)
-                {
+                switch (keyCode) {
                     case KeyEvent.KEYCODE_DPAD_CENTER:
                     case KeyEvent.KEYCODE_ENTER:
                         if (isPasswordCorrect(editText.getText().toString())){
@@ -53,7 +49,7 @@ public class lockActivity extends AppCompatActivity {
                                 finish();
                             }
 
-                            startService(unlockintent);
+                            startForegroundService(unlockintent);
                         } else {
                             Toast.makeText(getApplicationContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();
                         }

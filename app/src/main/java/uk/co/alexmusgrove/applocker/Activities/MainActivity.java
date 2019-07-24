@@ -159,7 +159,6 @@ public class  MainActivity extends AppCompatActivity {
 
     public void removeApp (appItem appItem, int position) {
         getContentResolver().delete(AppContentProvider.APP_CONTENT_URI, AppSQLiteDBHelper.COLUMN_PACKAGENAME + " = '" + appItem.getmPackageName() + "'", null);
-        Log.i(TAG, "removeApp: removed");
         appItems.get(position).setmLocked(false);
     }
 

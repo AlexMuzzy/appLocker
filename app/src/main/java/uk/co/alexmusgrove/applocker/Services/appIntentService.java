@@ -1,19 +1,18 @@
 package uk.co.alexmusgrove.applocker.Services;
 
 import android.app.ActivityManager;
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -23,64 +22,24 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import uk.co.alexmusgrove.applocker.Activities.HomeActivity;
-import uk.co.alexmusgrove.applocker.Activities.MainActivity;
 import uk.co.alexmusgrove.applocker.Activities.lockActivity;
 import uk.co.alexmusgrove.applocker.Database.AppContentProvider;
 import uk.co.alexmusgrove.applocker.Database.AppSQLiteDBHelper;
 import uk.co.alexmusgrove.applocker.Helpers.unlockedApp;
 import uk.co.alexmusgrove.applocker.R;
 
-public class appService extends Service {
+public class appIntentService extends IntentService {
 
-    private static boolean onState = false;
-    Intent testIntent;
+    public static final String TAG = "appIntentService";
 
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    public appIntentService() {
+        super("appIntentService");
+        Log.d(TAG, "appIntentService started.");
+        setIntentRedelivery(true);
     }
 
     @Override
-    public void onCreate() {
-        if (!onState){
-            onState = true;
-            //separate thread to call the service
-            new Thread(() -> {
-                while(true) {//recurring loop
-                    ArrayList<unlockedApp> unlockedApps = AppSQLiteDBHelper.getAllUnlockedApps(this);
-
-                    try {
-                        Thread.sleep(1000);//delay the loop for every second
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    for (unlockedApp i : unlockedApps){
-                        if (!i.isUnlocked()){
-                            getContentResolver().delete(AppContentProvider.UNLOCKEDAPP_CONTENT_URI,
-                                    AppSQLiteDBHelper.COLUMN_PACKAGENAME + " = '" + i.getPackageName() + "'",
-                                    null
-                            );//if the app has expired the unlock, then delete the unlock
-                        }
-                    }
-                    //REST OF CODE HERE//
-                    String packageName = getForegroundPackageName();
-                    if (isMyAppRunning()){//check if it is in foreground
-                        if (!isMyAppUnlocked(getForegroundPackageName())){// check app if it is not unlocked
-                            Intent intent = new Intent(getApplicationContext(), lockActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                            intent.putExtra("packageName", packageName);
-                            startActivity(intent);//start lock with app data
-                        }
-                    }
-                }
-            }).start();
-        }
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    protected void onHandleIntent(@Nullable Intent intent) {
         Bundle extras = intent.getExtras();
         if (extras != null){
             String unlockedPackageName = extras.getString("unlockedApp");
@@ -95,8 +54,39 @@ public class appService extends Service {
         Notification notification = buildForegroundNotification(pendingIntent);
 
         startForeground(1, notification);
+    }
 
-        return START_STICKY;
+    @Override
+    public void onCreate() {
+        //separate thread to call the service
+        while(true) {//recurring loop
+            ArrayList<unlockedApp> unlockedApps = AppSQLiteDBHelper.getAllUnlockedApps(this);
+            try {
+                Thread.sleep(1000);//delay the loop for every second
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            for (unlockedApp i : unlockedApps){
+                if (!i.isUnlocked()){
+                    getContentResolver().delete(AppContentProvider.UNLOCKEDAPP_CONTENT_URI,
+                            AppSQLiteDBHelper.COLUMN_PACKAGENAME + " = '" + i.getPackageName() + "'",
+                            null
+                    );//if the app has expired the unlock, then delete the unlock
+                }
+            }
+            //REST OF CODE HERE//
+            String packageName = getForegroundPackageName();
+            Log.d(TAG, "onCreate: " + packageName);
+            if (isMyAppRunning()){//check if it is in foreground
+                if (!isMyAppUnlocked(getForegroundPackageName())){// check app if it is not unlocked
+                    Intent intent = new Intent(getApplicationContext(), lockActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                    intent.putExtra("packageName", packageName);
+                    startActivity(intent);//start lock with app data
+                }
+            }
+        }
     }
     private String getForegroundPackageName() {
         String currentApp = null;
@@ -185,10 +175,5 @@ public class appService extends Service {
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(serviceChannel);
         }
-    }
-
-    public void stopForegroundService () {
-        stopForeground(true);
-        stopSelf();
     }
 }

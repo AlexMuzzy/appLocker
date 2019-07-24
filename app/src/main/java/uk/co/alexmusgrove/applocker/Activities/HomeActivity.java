@@ -55,6 +55,7 @@ public class HomeActivity extends AppCompatActivity{
             dialog.show(fragmentManager,"passwordFragment");
         }
         loadFragment(new userappsFragment());
+        startAppService();
     }
 
     private ArrayList<appItem> appItems = new ArrayList<>();
@@ -111,12 +112,6 @@ public class HomeActivity extends AppCompatActivity{
         });
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        startAppService();
-    }
-
     private boolean loadFragment(Fragment fragment){
         if (fragment != null){
             getSupportFragmentManager()
@@ -154,5 +149,10 @@ public class HomeActivity extends AppCompatActivity{
 
     public ArrayList<appItem> getAppItems() {
         return appItems;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }
