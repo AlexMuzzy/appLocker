@@ -28,6 +28,12 @@
             android:name="uk.co.alexmusgrove.applocker.Database.AppContentProvider"
         />
         <service android:name=".Services.appService"></service>
+        <service
+            android:name=".Services.appServicev2"
+            android:label="Locking Service"
+            android:permission="android.permission.BIND_JOB_SERVICE" >
+        </service>
+
     </application>
 
 </manifest>

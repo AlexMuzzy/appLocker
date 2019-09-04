@@ -9,13 +9,11 @@ import android.app.Service;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,14 +86,6 @@ public class appService extends Service {
                 addUnlockedApp(unlockedPackageName);
             }
         }
-        createNotificationChannel();
-        Intent notificationIntent = new Intent(this, HomeActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                0, notificationIntent, 0);
-        Notification notification = buildForegroundNotification(pendingIntent);
-
-        startForeground(1, notification);
-
         return START_STICKY;
     }
     private String getForegroundPackageName() {
@@ -156,39 +146,5 @@ public class appService extends Service {
         values.put(AppSQLiteDBHelper.COLUMN_PACKAGENAME, unlockedApp1.getPackageName());
         values.put(AppSQLiteDBHelper.COLUMN_UNLOCKEDAT, unlockedApp1.getUnlockedAt());
         getContentResolver().insert(AppContentProvider.APP_CONTENT_URI, values);
-    }
-
-    String CHANNEL_ID = "my_channel_1";// The id of the channel.
-
-    public Notification buildForegroundNotification (PendingIntent pendingIntent) {
-        Integer numberOfApps = AppSQLiteDBHelper.getAllApps(this).size();
-        String appSizeString = (numberOfApps > 1) ? " locked apps." : " locked app.";
-        // Create a notification and set the notification channel.
-        Notification notification = new Notification.Builder(this, CHANNEL_ID)
-                .setContentTitle("Locked Apps")
-                .setContentText("You currently have " + numberOfApps + appSizeString)
-                .setSmallIcon(R.drawable.ic_build_black_24dp)
-                .setChannelId(CHANNEL_ID)
-                .setContentIntent(pendingIntent)
-                .build();
-        return notification;
-    }
-
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel serviceChannel = new NotificationChannel(
-                    CHANNEL_ID,
-                    getString(R.string.appLockerChannel),
-                    NotificationManager.IMPORTANCE_MIN
-            );
-
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(serviceChannel);
-        }
-    }
-
-    public void stopForegroundService () {
-        stopForeground(true);
-        stopSelf();
     }
 }

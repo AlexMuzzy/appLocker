@@ -49,7 +49,7 @@ public class lockActivity extends AppCompatActivity {
                                 finish();
                             }
 
-                            startForegroundService(unlockintent);
+                            startService(unlockintent);
                         } else {
                             Toast.makeText(getApplicationContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
