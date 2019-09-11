@@ -43,18 +43,22 @@ public class HomeActivity extends AppCompatActivity{
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
         if (!hasUsageStatsPermission()) {
             permissionFragment dialog = permissionFragment.newInstance();
             dialog.show(this.getSupportFragmentManager(), "permissionFragment");
         }
+
         generateBottomNavBar();
-        generateAppItems();
+
         if(!hasPasswordSet()){
             passwordFragment dialog = passwordFragment.newInstance();
             FragmentManager fragmentManager = getSupportFragmentManager();
             dialog.show(fragmentManager,"passwordFragment");
         }
+
         loadFragment(new userappsFragment());
+
         startAppService();
     }
 
@@ -64,6 +68,9 @@ public class HomeActivity extends AppCompatActivity{
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
 
+            Bundle bundle = new Bundle();
+            bundle.put
+
             Fragment fragment = null;
 
             switch (item.getItemId()) {
@@ -71,15 +78,18 @@ public class HomeActivity extends AppCompatActivity{
                     Toast.makeText(HomeActivity.this, "User Apps", Toast.LENGTH_SHORT).show();
                     fragment = new userappsFragment();
                     break;
+
                 case R.id.action_system:
                     Toast.makeText(HomeActivity.this, "System Apps", Toast.LENGTH_SHORT).show();
                     fragment = new systemappsFragment();
                     break;
+
                 case R.id.action_settings:
                     Toast.makeText(HomeActivity.this, "Settings", Toast.LENGTH_SHORT).show();
                     fragment = new settingsFragment();
                     break;
             }
+
             return loadFragment(fragment);
         });
     }
@@ -145,14 +155,5 @@ public class HomeActivity extends AppCompatActivity{
 
     private boolean hasPasswordSet () {
         return !(settingsPreferences.getPassword(this) == null);
-    }
-
-    public ArrayList<appItem> getAppItems() {
-        return appItems;
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 }

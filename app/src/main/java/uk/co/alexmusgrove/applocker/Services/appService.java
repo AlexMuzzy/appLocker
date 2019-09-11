@@ -21,7 +21,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import uk.co.alexmusgrove.applocker.Activities.HomeActivity;
-import uk.co.alexmusgrove.applocker.Activities.MainActivity;
 import uk.co.alexmusgrove.applocker.Activities.lockActivity;
 import uk.co.alexmusgrove.applocker.Database.AppContentProvider;
 import uk.co.alexmusgrove.applocker.Database.AppSQLiteDBHelper;
