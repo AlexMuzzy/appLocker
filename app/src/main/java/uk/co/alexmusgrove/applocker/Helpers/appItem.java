@@ -1,8 +1,11 @@
 package uk.co.alexmusgrove.applocker.Helpers;
 
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class appItem {
+public class appItem  implements Parcelable {
     private String mAppName;
     private String mPackageName;
     private Drawable mAppIcon;
@@ -35,5 +38,22 @@ public class appItem {
 
     public void setmLocked(boolean mLocked) {
         this.mLocked = mLocked;
+    }
+
+    public appItem(Parcel in) {
+        this.mAppName = in.readString();
+        this.mPackageName = in.readString();
+        Bitmap bitmap = (Bitmap)in.readParcelable(getClass().getClassLoader());
+        this.mLocked = in.readInt == 1;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+
     }
 }

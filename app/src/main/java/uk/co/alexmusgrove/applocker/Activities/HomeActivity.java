@@ -1,23 +1,17 @@
 package uk.co.alexmusgrove.applocker.Activities;
 
 import android.app.AppOpsManager;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -30,12 +24,10 @@ import uk.co.alexmusgrove.applocker.Database.AppSQLiteDBHelper;
 import uk.co.alexmusgrove.applocker.Fragments.passwordFragment;
 import uk.co.alexmusgrove.applocker.Fragments.permissionFragment;
 import uk.co.alexmusgrove.applocker.Fragments.settingsFragment;
-import uk.co.alexmusgrove.applocker.Fragments.systemappsFragment;
-import uk.co.alexmusgrove.applocker.Fragments.userappsFragment;
+import uk.co.alexmusgrove.applocker.Fragments.appsFragment;
 import uk.co.alexmusgrove.applocker.Helpers.appItem;
 import uk.co.alexmusgrove.applocker.Preferences.settingsPreferences;
 import uk.co.alexmusgrove.applocker.R;
-import uk.co.alexmusgrove.applocker.Services.appService;
 
 public class HomeActivity extends AppCompatActivity{
 
@@ -57,31 +49,26 @@ public class HomeActivity extends AppCompatActivity{
             dialog.show(fragmentManager,"passwordFragment");
         }
 
-        loadFragment(new userappsFragment());
+        loadFragment(new appsFragment());
 
         startAppService();
     }
 
-    private ArrayList<appItem> appItems = new ArrayList<>();
-
     public void generateBottomNavBar () {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-
-            Bundle bundle = new Bundle();
-            bundle.put
 
             Fragment fragment = null;
 
             switch (item.getItemId()) {
                 case R.id.action_user:
                     Toast.makeText(HomeActivity.this, "User Apps", Toast.LENGTH_SHORT).show();
-                    fragment = new userappsFragment();
+                    fragment = new appsFragment();
                     break;
 
                 case R.id.action_system:
                     Toast.makeText(HomeActivity.this, "System Apps", Toast.LENGTH_SHORT).show();
-                    fragment = new systemappsFragment();
+                    fragment = new appsFragment();
                     break;
 
                 case R.id.action_settings:
@@ -94,33 +81,6 @@ public class HomeActivity extends AppCompatActivity{
         });
     }
 
-    public void generateAppItems () {
-        final PackageManager pm = getPackageManager();
-        //get a list of installed apps.
-        List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-        for (ApplicationInfo packageInfo : packages) {
-            //filter all systems applications out of loop
-            if (!((packageInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0)) {
-                //grab application label from package name
-                String appName = (String) pm.getApplicationLabel(packageInfo);
-                ArrayList<String> appList = AppSQLiteDBHelper.getAllApps(this);
-                //append details to appItem class
-                if (!packageInfo.packageName.equals("uk.co.alexmusgrove.applocker")){
-                    appItems.add(new appItem(
-                            appName, //name of application
-                            packageInfo.packageName, // unique package name of application
-                            packageInfo.loadIcon(pm), // application icon
-                            appList.contains(packageInfo.packageName) // app lock switch state
-                    ));
-                }
-            }
-        }
-        Collections.sort(appItems, (Comparator) (o1, o2) -> {
-            appItem app1 = (appItem) o1;
-            appItem app2 = (appItem) o2;
-            return app1.getmAppName().compareToIgnoreCase(app2.getmAppName());
-        });
-    }
 
     private boolean loadFragment(Fragment fragment){
         if (fragment != null){
