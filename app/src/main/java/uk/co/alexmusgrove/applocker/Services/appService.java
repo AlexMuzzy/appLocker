@@ -38,6 +38,8 @@ public class appService extends Service {
         return null;
     }
 
+
+
     @Override
     public void onCreate() {
         if (!onState){
@@ -52,7 +54,7 @@ public class appService extends Service {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    for (unlockedApp i : unlockedApps){
+                    for (unlockedApp i : unlockedApps){//iterate through each app that is currently unlocked
                         if (!i.isUnlocked()){
                             getContentResolver().delete(AppContentProvider.UNLOCKEDAPP_CONTENT_URI,
                                     AppSQLiteDBHelper.COLUMN_PACKAGENAME + " = '" + i.getPackageName() + "'",
@@ -87,6 +89,9 @@ public class appService extends Service {
         }
         return START_STICKY;
     }
+
+
+
     private String getForegroundPackageName() {
         String currentApp = null;
 
@@ -129,6 +134,8 @@ public class appService extends Service {
         return appList.contains(getForegroundPackageName());
     }
 
+
+
     private boolean isMyAppUnlocked (String packageName) {
         ArrayList<unlockedApp> unlockedApps = AppSQLiteDBHelper.getAllUnlockedApps(this);
         for (unlockedApp i : unlockedApps){
@@ -138,6 +145,8 @@ public class appService extends Service {
         }
         return false;
     }
+
+
 
     public void addUnlockedApp (String unlockedApp) {
         ContentValues values = new ContentValues();

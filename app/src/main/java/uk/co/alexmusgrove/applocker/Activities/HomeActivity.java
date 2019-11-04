@@ -1,11 +1,8 @@
 package uk.co.alexmusgrove.applocker.Activities;
 
 import android.app.AppOpsManager;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
@@ -14,18 +11,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import uk.co.alexmusgrove.applocker.Database.AppContentProvider;
-import uk.co.alexmusgrove.applocker.Database.AppSQLiteDBHelper;
 import uk.co.alexmusgrove.applocker.Fragments.passwordFragment;
 import uk.co.alexmusgrove.applocker.Fragments.permissionFragment;
 import uk.co.alexmusgrove.applocker.Fragments.settingsFragment;
 import uk.co.alexmusgrove.applocker.Fragments.appsFragment;
-import uk.co.alexmusgrove.applocker.Helpers.appItem;
 import uk.co.alexmusgrove.applocker.Preferences.settingsPreferences;
 import uk.co.alexmusgrove.applocker.R;
 

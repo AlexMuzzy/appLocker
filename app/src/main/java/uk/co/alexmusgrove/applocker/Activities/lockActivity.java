@@ -71,8 +71,8 @@ public class lockActivity extends AppCompatActivity {
             Drawable icon = packageManager.getApplicationIcon(app);
             String name = (String) packageManager.getApplicationLabel(app);
 
-            ImageView appIcon = (ImageView) findViewById(R.id.appicon_imageview);
-            TextView appLabel = (TextView) findViewById(R.id.appname_textview);
+            ImageView appIcon = findViewById(R.id.appicon_imageview);
+            TextView appLabel = findViewById(R.id.appname_textview);
 
             appIcon.setImageDrawable(icon);
             appLabel.setText(name);
@@ -88,5 +88,15 @@ public class lockActivity extends AppCompatActivity {
     public boolean isPasswordCorrect (String password) {
         String testPassword = settingsPreferences.getPassword(this);
         return password.equals(testPassword);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startMain);
     }
 }
