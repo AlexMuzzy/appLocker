@@ -30,8 +30,6 @@ import uk.co.alexmusgrove.applocker.R;
 public class appService extends Service {
 
     private static boolean onState = false;
-    Intent testIntent;
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {

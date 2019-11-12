@@ -1,10 +1,8 @@
 package uk.co.alexmusgrove.applocker.Fragments;
-
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.ComponentName;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
@@ -20,17 +18,16 @@ import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import uk.co.alexmusgrove.applocker.Adapters.appAdapter;
-import uk.co.alexmusgrove.applocker.Database.AppContentProvider;
-import uk.co.alexmusgrove.applocker.Database.AppSQLiteDBHelper;
 import uk.co.alexmusgrove.applocker.Helpers.appItem;
 import uk.co.alexmusgrove.applocker.R;
+import uk.co.alexmusgrove.applocker.ViewModels.AppViewModel;
 
 public class appsFragment extends Fragment {
+
+    AppViewModel viewModel;
 
     @Nullable
     @Override
@@ -39,18 +36,20 @@ public class appsFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        viewModel = ViewModelProviders.of(this).get(AppViewModel.class);
+    }
+
+    @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         buildRecyclerView();
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        generateAppItems();
-    }
+/*
 
-    private ArrayList<appItem> appItems = new ArrayList<>();
+    method and app list generation has moved to 'ViewModels/appViewModel'
 
     public void generateAppItems () {
         final PackageManager pm = getActivity().getPackageManager();
@@ -79,18 +78,19 @@ public class appsFragment extends Fragment {
             return app1.getmAppName().compareToIgnoreCase(app2.getmAppName());
         });
     }
+*/
 
     public void buildRecyclerView () {
         RecyclerView recyclerView = getView().findViewById(R.id.user_recycler_view);
+        ArrayList<appItem> appItems = viewModel.getAppItems();
+        recyclerView.setHasFixedSize(true);
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
-        recyclerView.setHasFixedSize(true);
         // use a linear layout manager
         RecyclerView.LayoutManager recyclerViewLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
-
         // specify an adapter
-        appAdapter adapter = new appAdapter(appItems);
+        appAdapter adapter = new appAdapter(viewModel.getAppItems());
         recyclerView.setAdapter(adapter);
 
         adapter.setOnItemClickListener(
@@ -99,10 +99,10 @@ public class appsFragment extends Fragment {
         adapter.setOnCheckedChangeListener((CompoundButton buttonView, int position, boolean isChecked) -> {
             if (buttonView.isShown()) {
                 if (isChecked) {
-                    addApp(appItems.get(position), position);
+                    viewModel.addApp(appItems.get(position), position);
                 }
                 if(!isChecked){
-                    removeApp(appItems.get(position), position);
+                    viewModel.removeApp(appItems.get(position), position);
                 }
                 Toast.makeText(
                         getActivity(),
@@ -122,30 +122,18 @@ public class appsFragment extends Fragment {
         List<ResolveInfo> resolveInfos = pm.queryIntentActivities(intent, 0);
         resolveInfos.sort(new ResolveInfo.DisplayNameComparator(pm));
 
-        if(resolveInfos.size() > 0) {
+        if (resolveInfos.size() > 0) {
             ResolveInfo launchable = resolveInfos.get(0);
             ActivityInfo activity = launchable.activityInfo;
-            ComponentName name=new ComponentName(activity.applicationInfo.packageName,
+            ComponentName name = new ComponentName(activity.applicationInfo.packageName,
                     activity.name);
-            Intent i=new Intent(Intent.ACTION_MAIN);
+            Intent i = new Intent(Intent.ACTION_MAIN);
 
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
             i.setComponent(name);
 
             startActivity(i);
         }
-    }
-
-    public void addApp (appItem appItem, int position) {
-        ContentValues values = new ContentValues();
-        values.put(AppSQLiteDBHelper.COLUMN_PACKAGENAME, appItem.getmPackageName());
-        getActivity().getContentResolver().insert(AppContentProvider.APP_CONTENT_URI, values);
-        appItems.get(position).setmLocked(true);
-    }
-
-    public void removeApp (appItem appItem, int position) {
-        getActivity().getContentResolver().delete(AppContentProvider.APP_CONTENT_URI, AppSQLiteDBHelper.COLUMN_PACKAGENAME + " = '" + appItem.getmPackageName() + "'", null);
-        appItems.get(position).setmLocked(false);
     }
 
     @Override
