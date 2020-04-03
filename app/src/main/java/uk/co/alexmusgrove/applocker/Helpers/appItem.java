@@ -35,5 +35,4 @@ public class appItem {
     public void setmLocked(boolean mLocked) {
         this.mLocked = mLocked;
     }
-
 }

@@ -52,34 +52,6 @@ public class appsFragment extends Fragment {
 
     private ArrayList<appItem> appItems = new ArrayList<>();
 
-    public void generateAppItems () {
-        final PackageManager pm = getActivity().getPackageManager();
-        //get a list of installed apps.
-        List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-        for (ApplicationInfo packageInfo : packages) {
-            //filter all systems applications out of loop
-            if ((packageInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
-                //grab application label from package name
-                String appName = (String) pm.getApplicationLabel(packageInfo);
-                ArrayList<String> appList = AppSQLiteDBHelper.getAllApps(getActivity());
-                //append details to appItem class
-                if (!packageInfo.packageName.equals("uk.co.alexmusgrove.applocker")){
-                    appItems.add(new appItem(
-                            appName, //name of application
-                            packageInfo.packageName, // unique package name of application
-                            packageInfo.loadIcon(pm), // application icon
-                            appList.contains(packageInfo.packageName) // app lock switch state
-                    ));
-                }
-            }
-        }
-        Collections.sort(appItems, (Comparator) (o1, o2) -> {
-            appItem app1 = (appItem) o1;
-            appItem app2 = (appItem) o2;
-            return app1.getmAppName().compareToIgnoreCase(app2.getmAppName());
-        });
-    }
-
     public void buildRecyclerView () {
         RecyclerView recyclerView = getView().findViewById(R.id.user_recycler_view);
         // use this setting to improve performance if you know that changes
@@ -144,7 +116,11 @@ public class appsFragment extends Fragment {
     }
 
     public void removeApp (appItem appItem, int position) {
-        getActivity().getContentResolver().delete(AppContentProvider.APP_CONTENT_URI, AppSQLiteDBHelper.COLUMN_PACKAGENAME + " = '" + appItem.getmPackageName() + "'", null);
+        getActivity().getContentResolver().delete(
+                AppContentProvider.APP_CONTENT_URI,
+                AppSQLiteDBHelper.COLUMN_PACKAGENAME + " = '" + appItem.getmPackageName() + "'",
+                null
+        );
         appItems.get(position).setmLocked(false);
     }
 

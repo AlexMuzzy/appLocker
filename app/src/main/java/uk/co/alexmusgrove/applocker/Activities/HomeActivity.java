@@ -9,16 +9,23 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 import uk.co.alexmusgrove.applocker.Fragments.passwordFragment;
 import uk.co.alexmusgrove.applocker.Fragments.permissionFragment;
 import uk.co.alexmusgrove.applocker.Fragments.settingsFragment;
 import uk.co.alexmusgrove.applocker.Fragments.appsFragment;
+import uk.co.alexmusgrove.applocker.Helpers.appItem;
+import uk.co.alexmusgrove.applocker.Helpers.appItems;
 import uk.co.alexmusgrove.applocker.Preferences.settingsPreferences;
 import uk.co.alexmusgrove.applocker.R;
 
 public class HomeActivity extends AppCompatActivity{
+
+    public appItems appItems  = new appItems(getApplicationContext());;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,6 +48,7 @@ public class HomeActivity extends AppCompatActivity{
         loadFragment(new appsFragment());
 
         startAppService();
+
     }
 
     public void generateBottomNavBar () {
