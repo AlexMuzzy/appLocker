@@ -15,11 +15,9 @@
         <activity android:name=".Activities.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.MainActivity"></activity>
         <activity android:name=".Activities.SettingsActivity"></activity>
         <activity android:name=".Activities.lockActivity"
             android:noHistory="true"></activity>

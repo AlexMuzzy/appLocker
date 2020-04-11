@@ -1,10 +1,12 @@
 <resources>
     <string name="app_name">appLocker</string>
-    <string name="settings">Settings</string>
     <string name="main_menu">Main Menu</string>
     <string name="usage_permission">Please grant usage access permission to this application.</string>
     <string name="password">Password</string>
-    <string name="newPassword">Type here...</string>
+    <string name="newPassword">Type here…</string>
     <string name="appLockerChannel">appLocker</string>
     <string name="label_share">Share</string>
+    <string name="user_apps">Apps</string>
+    <string name="locked_apps">Locked Apps</string>
+    <string name="settings">Settings</string>
 </resources>
