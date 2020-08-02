@@ -3,20 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_user"
-        android:icon="@drawable/ic_action_user"
-        android:title="User Apps"
+        android:id="@+id/action_apps"
+        android:icon="@drawable/ic_action_apps"
+        android:title="@string/user_apps"
         app:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/action_system"
-        android:icon="@drawable/ic_action_system"
-        android:title="System Apps"
+        android:id="@+id/action_locked"
+        android:icon="@drawable/ic_action_locked"
+        android:title="@string/locked_apps"
         app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_action_settings"
-        android:title="Settings"
+        android:title="@string/settings"
         app:showAsAction="ifRoom"/>
 </menu>

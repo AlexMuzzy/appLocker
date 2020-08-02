@@ -23,9 +23,9 @@ import uk.co.alexmusgrove.applocker.Helpers.appItems;
 import uk.co.alexmusgrove.applocker.Preferences.settingsPreferences;
 import uk.co.alexmusgrove.applocker.R;
 
-public class HomeActivity extends AppCompatActivity{
+public class HomeActivity extends AppCompatActivity {
 
-    public appItems appItems  = new appItems(getApplicationContext());;
+    public appItems appItems;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,11 +39,13 @@ public class HomeActivity extends AppCompatActivity{
 
         generateBottomNavBar();
 
-        if(!hasPasswordSet()){
+        if (!hasPasswordSet()) {
             passwordFragment dialog = passwordFragment.newInstance();
             FragmentManager fragmentManager = getSupportFragmentManager();
-            dialog.show(fragmentManager,"passwordFragment");
+            dialog.show(fragmentManager, "passwordFragment");
         }
+
+        appItems = new appItems(getApplicationContext());
 
         loadFragment(new appsFragment());
 
@@ -51,25 +53,32 @@ public class HomeActivity extends AppCompatActivity{
 
     }
 
-    public void generateBottomNavBar () {
+    public void generateBottomNavBar() {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
 
             Fragment fragment = null;
+            Bundle bundle = new Bundle();
 
             switch (item.getItemId()) {
-                case R.id.action_user:
-                    Toast.makeText(HomeActivity.this, "User Apps", Toast.LENGTH_SHORT).show();
+                case R.id.action_apps:
+                    bundle.putBoolean("lockFragment", false);
+                    Toast.makeText(HomeActivity.this, R.string.user_apps, Toast.LENGTH_SHORT).show();
+
                     fragment = new appsFragment();
+                    fragment.setArguments(bundle);
                     break;
 
-                case R.id.action_system:
-                    Toast.makeText(HomeActivity.this, "System Apps", Toast.LENGTH_SHORT).show();
+                case R.id.action_locked:
+                    bundle.putBoolean("lockFragment", true);
+                    Toast.makeText(HomeActivity.this, R.string.locked_apps, Toast.LENGTH_SHORT).show();
+
                     fragment = new appsFragment();
+                    fragment.setArguments(bundle);
                     break;
 
                 case R.id.action_settings:
-                    Toast.makeText(HomeActivity.this, "Settings", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(HomeActivity.this, R.string.settings, Toast.LENGTH_SHORT).show();
                     fragment = new settingsFragment();
                     break;
             }
@@ -79,8 +88,8 @@ public class HomeActivity extends AppCompatActivity{
     }
 
 
-    private boolean loadFragment(Fragment fragment){
-        if (fragment != null){
+    private boolean loadFragment(Fragment fragment) {
+        if (fragment != null) {
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, fragment)
@@ -92,7 +101,7 @@ public class HomeActivity extends AppCompatActivity{
     }
 
 
-    private boolean hasUsageStatsPermission () {
+    private boolean hasUsageStatsPermission() {
         AppOpsManager appOpsManager = (AppOpsManager) this.getSystemService(Context.APP_OPS_SERVICE);
         int mode = 0;
         if (appOpsManager != null) {
@@ -101,7 +110,7 @@ public class HomeActivity extends AppCompatActivity{
         return (mode == AppOpsManager.MODE_ALLOWED);
     }
 
-    public void startAppService () {
+    public void startAppService() {
         if (hasUsageStatsPermission()) {
             //check if user has granted permission for usage of this service.
             Intent appService = new Intent(this, uk.co.alexmusgrove.applocker.Services.appService.class);
@@ -110,7 +119,12 @@ public class HomeActivity extends AppCompatActivity{
         }
     }
 
-    private boolean hasPasswordSet () {
+    private boolean hasPasswordSet() {
         return !(settingsPreferences.getPassword(this) == null);
     }
+
+    public ArrayList<appItem> getAppItems() {
+        return appItems.appItems;
+    }
 }
+
